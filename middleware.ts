@@ -10,7 +10,7 @@ export function middleware(req: NextRequest){
     }
 
     if(session && isLoginPage){
-        return NextResponse.redirect(new URL("/jobs",req.url));
+        return NextResponse.redirect(new URL("/dashboard",req.url));
     }
 
     return NextResponse.next();

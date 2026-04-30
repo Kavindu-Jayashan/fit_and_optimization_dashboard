@@ -92,7 +92,7 @@ export function LoginForm({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setSuccess("Verified! Redirecting...");
-      setTimeout(() => router.push("/jobs"), 1000);
+      setTimeout(() => router.push("/dashboard"), 1000);
     } catch (error: any) {
       setError(error.message || "invalid or expired code!");
     } finally {

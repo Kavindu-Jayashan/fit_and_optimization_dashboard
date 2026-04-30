@@ -27,14 +27,14 @@ const data = {
   },
   navMain: [
     {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboardIcon,
+    },
+    {
       title: "Job Listings",
       url: "/jobs",
       icon: BriefcaseIcon,
-    },
-    {
-      title: "Dashbaord",
-      url: "/dashbaord",
-      icon: LayoutDashboardIcon,
     },
     {
       title: "My CVs",
@@ -78,9 +78,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           {data.navMain.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild >
-                <a href={item.url} >
-                  <item.icon  className="size-4"/>
+              <SidebarMenuButton asChild>
+                <a href={item.url}>
+                  <item.icon className="size-4" />
                   <span>{item.title}</span>
                 </a>
               </SidebarMenuButton>
