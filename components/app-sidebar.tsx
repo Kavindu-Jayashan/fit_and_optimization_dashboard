@@ -6,6 +6,7 @@ import {
   FileTextIcon,
   LayoutDashboardIcon,
   Settings2Icon,
+  SparklesIcon,
 } from "lucide-react";
 import {
   Sidebar,
@@ -27,14 +28,14 @@ const data = {
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboardIcon,
-    },
-    {
       title: "Job Listings",
       url: "/jobs",
       icon: BriefcaseIcon,
+    },
+    {
+      title: "Generate Job Description",
+      url: "jobs/new",
+      icon:SparklesIcon,
     },
     {
       title: "My CVs",
