@@ -1,28 +1,37 @@
-import { generateJobDescription } from "../lib/openai";
-import { getAllJobs, saveJob } from "../repositories/jobRepository";
+import { CreateJobInput, JobRecord } from "./../types/job";
+import { IJobGenerationService } from "../interfaces/IJobGenerationService";
+import { IJobRepository } from "../interfaces/IJobRepository";
 
-export async function createJob(
-  title: string,
-  seniority: string,
-  industry: string,
-  responsibilities: string,
+export function createJobService(
+  jobRepo: IJobRepository,
+  generationService: IJobGenerationService,
 ) {
-  // generating the job description and ATS keywords via AI
-  const generated = await generateJobDescription(
-    title,
-    seniority,
-    industry,
-    responsibilities,
-  );
 
-  // saving the generated job to storage
-  const jobId = `job-${Date.now()}`;
-  await saveJob(jobId, generated);
+  // creating the job 
+  async function CreateJob(input: CreateJobInput): Promise<{ jobId: string }> {
+    const { title, seniority, industry, responsibilities } = input;
 
-  return { jobId, generated };
-}
+    const generated = await generationService.generate(
+      title,
+      seniority,
+      industry,
+      responsibilities,
+    );
+    const jobId = `job-${Date.now()}`;
+    await jobRepo.save(jobId, generated);
+    return { jobId };
+  }
 
-// retrieving all available  jobs in the storage
-export async function getJobs() {
-  return getAllJobs();
+  // retrieve all job listings
+  async function getAllJobs(): Promise<JobRecord[]> {
+    return jobRepo.findAll();
+  }
+
+  // retrieve a single job for detailed view
+  async function getJobById(jobId: string): Promise<JobRecord | null> {
+    const job = await jobRepo.findById(jobId);
+    if (!job) throw new Error(`Job with id ${jobId} not found`);
+    return job;
+  }
+  return { CreateJob, getAllJobs, getJobById };
 }

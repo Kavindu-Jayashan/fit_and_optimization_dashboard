@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateOTP, storeOTP } from "../../../../lib/otp";
-import { sentOTPEmail } from "../../../../lib/sendEmail";
+import { createAuthService } from "../../../../services/authService";
+import { authRepoInstance } from "../../../../repositories/authRepo";
 
+// same instance used in verify-otp so that
+// in-memory OTP store is consistent across both routes
+const authService = createAuthService(authRepoInstance);
+
+
+// validate email and trigger OTP generation and delivery
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();
@@ -13,10 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const otp = generateOTP();
-    storeOTP(email, otp);
-    await sentOTPEmail(email, otp);
-
+    await authService.sendOTP(email);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("send otp error: ", err);

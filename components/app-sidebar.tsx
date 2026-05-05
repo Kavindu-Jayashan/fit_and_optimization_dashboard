@@ -35,12 +35,7 @@ const data = {
     {
       title: "Generate Job Description",
       url: "jobs/new",
-      icon:SparklesIcon,
-    },
-    {
-      title: "My CVs",
-      url: "#",
-      icon: FileTextIcon,
+      icon: SparklesIcon,
     },
   ],
   navSecondary: [

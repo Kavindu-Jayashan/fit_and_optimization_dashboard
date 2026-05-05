@@ -1,50 +1,35 @@
-import { generateJobDescription } from "./../../../../lib/openai";
 import { NextRequest, NextResponse } from "next/server";
-import { TableClient } from "@azure/data-tables";
-import { createJob } from "../../../../services/jobService";
+import { createJobService } from "../../../../services/jobService";
+import { createJobRepo } from "../../../../repositories/jobRepository";
+import { createOpenAIGenerationService } from "../../../../services/openAIGenerationService";
 
-const tableClient = TableClient.fromConnectionString(
-  process.env.AZURE_STORAGE_CONNECTION_STRING!,
-  process.env.AZURE_TABLE_NAME!,
-);
-
-export async function POST(request: NextRequest) {
+// accept recruiter input and triggers the JD generation
+export async function POST(req: NextRequest) {
   try {
-    const { title, seniority, industry, responsibilities } =
-      await request.json();
-
+    const { title, seniority, industry, responsibilities } = await req.json();
     if (!title || !seniority || !industry || !responsibilities) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 },
       );
     }
+    const service = createJobService(
+      createJobRepo(),
+      createOpenAIGenerationService(),
+    );
 
-    const res = await createJob(title, seniority, industry, responsibilities);
-
-    return NextResponse.json({
-      success: true,
-      ...res,
+    const result = await service.CreateJob({
+      title,
+      seniority,
+      industry,
+      responsibilities,
     });
-  } catch (error: any) {
-    console.error("Generated JD error: ", error);
 
-    if (error.status === 429) {
-      return NextResponse.json(
-        { error: "OpenAi rate limit reached. please try again shortly." },
-        { status: 429 },
-      );
-    }
-
-    if (error.code === "ECONNRESET" || error.code === "REQUEST_SEND_ERROR") {
-      return NextResponse.json(
-        { error: "Connection timed out. please try again." },
-        { status: 503 },
-      );
-    }
-
+    return NextResponse.json({ success: true, jobId: result.jobId });
+  } catch (err: any) {
+    console.error("POST /api/jobs/generate error: ", err);
     return NextResponse.json(
-      { error: error.message || "Failed to generate job Description." },
+      { error: err.message || "Failed to generate Job Description." },
       { status: 500 },
     );
   }

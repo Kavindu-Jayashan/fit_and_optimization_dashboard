@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function proxy(req: NextRequest) {
+export function middleware(req: NextRequest) {
   const session = req.cookies.get("session_email");
   const isLoginPage = req.nextUrl.pathname === "/login";
   const isRoot = req.nextUrl.pathname === "/";
@@ -21,5 +21,5 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/","/jobs/:path*", "/login"],
+  matcher: ["/", "/jobs/:path*", "/login"],
 };
