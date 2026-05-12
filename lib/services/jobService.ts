@@ -6,8 +6,7 @@ export function createJobService(
   jobRepo: IJobRepository,
   generationService: IJobGenerationService,
 ) {
-
-  // creating the job 
+  // creating the job
   async function CreateJob(input: CreateJobInput): Promise<{ jobId: string }> {
     const { title, seniority, industry, responsibilities } = input;
 
@@ -33,5 +32,14 @@ export function createJobService(
     if (!job) throw new Error(`Job with id ${jobId} not found`);
     return job;
   }
-  return { CreateJob, getAllJobs, getJobById };
+
+  // update a specific job by job id
+  async function updateJob(
+    jobId: string,
+    updates: Partial<JobRecord>,
+  ): Promise<void> {
+    await jobRepo.update(jobId, updates);
+  }
+
+  return { CreateJob, getAllJobs, getJobById , updateJob };
 }

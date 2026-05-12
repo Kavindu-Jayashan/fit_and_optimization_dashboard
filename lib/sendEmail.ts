@@ -1,3 +1,4 @@
+import "server-only";
 import { EmailClient } from "@azure/communication-email";
 // import {EmailClient} from "@azure/communication-email";
 

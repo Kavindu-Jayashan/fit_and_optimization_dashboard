@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAuthService } from "../../../../services/authService";
-import { authRepoInstance } from "../../../../repositories/authRepo";
+import { createAuthService } from "../../../../lib/services/authService";
+import { authRepoInstance } from "../../../../lib/repositories/authRepo";
 
 // same instance used in verify-otp so that
 // in-memory OTP store is consistent across both routes

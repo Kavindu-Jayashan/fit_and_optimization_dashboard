@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { createJobService } from "../../../services/jobService";
-import { createJobRepo } from "../../../repositories/jobRepository";
-import { createOpenAIGenerationService } from "../../../services/openAIGenerationService";
+import { createJobService } from "../../../lib/services/jobService";
+import { createJobRepo } from "../../../lib/repositories/jobRepository";
+import { createOpenAIGenerationService } from "../../../lib/services/openAIGenerationService";
 
 export async function GET() {
   try {

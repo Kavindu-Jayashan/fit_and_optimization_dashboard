@@ -41,3 +41,11 @@ export type CreateJobInput = {
   industry: string;
   responsibilities: string;
 };
+
+export type EditableJob = {
+  title: string;
+  seniority: string;
+  industry: string;
+  description: string;
+  atsKeywords: ATSKeywords;
+};

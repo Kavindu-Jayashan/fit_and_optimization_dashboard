@@ -1,5 +1,5 @@
 import { IAuthRepository } from "../interfaces/IAuthRepository";
-import { sentOTPEmail } from "../lib/sendEmail";
+import { sentOTPEmail } from "@/lib/sendEmail";
 
 // handles all OTP authentication logic
 

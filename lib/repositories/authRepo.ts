@@ -1,3 +1,4 @@
+import "server-only";
 import { IAuthRepository } from "../interfaces/IAuthRepository";
 import { OTPRecord } from "../types/auth";
 

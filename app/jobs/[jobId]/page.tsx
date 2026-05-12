@@ -5,26 +5,15 @@ import { useEffect, useState } from "react";
 import { SidebarInset, SidebarProvider } from "../../../components/ui/sidebar";
 import { AppSidebar } from "../../../components/app-sidebar";
 import { SiteHeader } from "../../../components/site-header";
+import { ATSKeywords, JobRecord } from "../../../lib/types/job";
 
-type ATSKeywords = {
-  hardSkills: string[];
-  softSkills: string[];
-  qualifications: string[];
-  experience: string[];
-};
 
-type Job = {
-  rowKey: string;
-  title: string;
-  seniority: string;
-  industry: string;
-  description: string;
-  atsKeywordsJson: string;
-};
+
+
 
 export default function JobDetailsPage() {
   const { jobId } = useParams();
-  const [job, setJob] = useState<Job | null>(null);
+  const [job, setJob] = useState<JobRecord | null>(null);
   const [keywords, setKeywords] = useState<ATSKeywords | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,13 +24,13 @@ export default function JobDetailsPage() {
       try {
         const response = await fetch("/api/jobs");
         const data = await response.json();
-        
+
         if (!response.ok) {
           throw new Error(data.error);
         }
-        const found = data.jobs.find((job: Job) => job.rowKey === jobId);
+        const found = data.jobs.find((job: JobRecord) => job.rowKey === jobId);
         if (!found) throw new Error("Job Not Found.");
-        
+
         setJob(found);
         setKeywords(JSON.parse(found.atsKeywordsJson));
       } catch (error: any) {
@@ -110,10 +99,10 @@ export default function JobDetailsPage() {
           <SiteHeader />
           <div className="flex flex-1 flex-col p-6 gap-4 max-w-4xl">
             <div className="animate-pulse flex flex-col gap-4">
-              <div className="h-8 bg-gray-100 rounded-xl w-1/3" />
-              <div className="h-4 bg-gray-100 rounded w-1/4" />
-              <div className="h-64 bg-gray-100 rounded-2xl" />
-              <div className="h-32 bg-gray-100 rounded-2xl" />
+              <div className="h-8 bg-gray-400 rounded-xl w-1/3" />
+              <div className="h-4 bg-gray-500 rounded w-1/4" />
+              <div className="h-64 bg-gray-400 rounded-2xl" />
+              <div className="h-32 bg-gray-500 rounded-2xl" />
             </div>
           </div>
         </SidebarInset>
@@ -170,6 +159,12 @@ export default function JobDetailsPage() {
                 {job?.title}
               </h1>
             </div>
+            <a
+              href={`/jobs/${jobId}/edit`}
+              className="bg-[#4a7c59] hover:bg-[#5a9c6e] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#4a7c59]/30"
+            >
+              Edit JD
+            </a>
             <a
               href="/jobs/new"
               className="text-sm text-gray-400 hover:text-[#4a7c59] transition-colors shrink-0 mt-1"

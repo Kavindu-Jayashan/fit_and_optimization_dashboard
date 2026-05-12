@@ -4,4 +4,6 @@ export interface IJobRepository {
   save(jobId: string, job: GeneratedJob): Promise<void>;
   findAll(): Promise<JobRecord[]>;
   findById(jobId: string): Promise<JobRecord | null>;
+  update(jobId: string, updates: Partial<JobRecord>): Promise<void>;
 }
+

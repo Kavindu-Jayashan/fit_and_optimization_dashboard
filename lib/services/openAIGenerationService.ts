@@ -7,9 +7,7 @@ export function createOpenAIGenerationService(): IJobGenerationService {
     apiKey: process.env.OPENAI_API_KEY!,
   });
 
-
-
-//   generate a professional job description and categorized keywords
+  //   generate a professional job description and categorized keywords
   async function generate(
     title: string,
     seniority: string,
@@ -45,12 +43,12 @@ export function createOpenAIGenerationService(): IJobGenerationService {
 
     const raw = res.choices[0].message.content ?? "";
 
-    // clean the raw response got from the AI to remove unwanted markdowns 
+    // clean the raw response got from the AI to remove unwanted markdowns
     try {
       const clean = raw.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(clean);
 
-    //   handles if the job description returns as a nested object 
+      //   handles if the job description returns as a nested object
       let jobDescription = parsed.jobDescription;
       if (typeof jobDescription === "object") {
         jobDescription = Object.entries(jobDescription)

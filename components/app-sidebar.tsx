@@ -34,7 +34,7 @@ const data = {
     },
     {
       title: "Generate Job Description",
-      url: "jobs/new",
+      url: "/jobs/new",
       icon: SparklesIcon,
     },
   ],
@@ -44,11 +44,7 @@ const data = {
       url: "#",
       icon: <Settings2Icon />,
     },
-    {
-      title: "logout",
-      url: "#",
-      icon: <DoorClosedLockedIcon />,
-    },
+    
   ],
 };
 

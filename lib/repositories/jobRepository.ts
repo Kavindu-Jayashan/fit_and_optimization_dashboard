@@ -62,5 +62,18 @@ export function createJobRepo(): IJobRepository {
     return all.find((job) => job.rowKey === jobId) ?? null;
   }
 
-  return { save, findAll, findById };
+  async function update(jobId: string, updates: Partial<JobRecord>) {
+    await tableClient.upsertEntity({
+      partitionKey: "jobs",
+      rowKey: jobId,
+      ...Object.fromEntries(
+        Object.entries(updates).map(([key, value]) => [
+          key,
+          String(value ?? ""),
+        ]),
+      ),
+    });
+  }
+
+  return { save, findAll, findById, update };
 }

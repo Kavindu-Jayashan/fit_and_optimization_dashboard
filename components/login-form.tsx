@@ -12,6 +12,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export function LoginForm({
   className,
@@ -81,18 +82,16 @@ export function LoginForm({
     setError("");
     setLoading(true);
     try {
-      const response = await fetch(`/api/auth/verify-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, otp: otp.join("") }),
+      const result = await signIn("credentials", {
+        email,
+        otp: otp.join(""),
+        redirect: false,
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+      if (result.error) throw new Error("session creation failed");
+
       setSuccess("Verified! Redirecting...");
-      setTimeout(() => router.push("/dashboard"), 1000);
+      setTimeout(() => router.push("/jobs"), 1000);
     } catch (error: any) {
       setError(error.message || "invalid or expired code!");
     } finally {
