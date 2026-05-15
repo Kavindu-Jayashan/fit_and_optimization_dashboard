@@ -7,10 +7,6 @@ import { AppSidebar } from "../../../components/app-sidebar";
 import { SiteHeader } from "../../../components/site-header";
 import { ATSKeywords, JobRecord } from "../../../lib/types/job";
 
-
-
-
-
 export default function JobDetailsPage() {
   const { jobId } = useParams();
   const [job, setJob] = useState<JobRecord | null>(null);
@@ -159,6 +155,12 @@ export default function JobDetailsPage() {
                 {job?.title}
               </h1>
             </div>
+            <a
+              href={`/jobs/${jobId}/quiz/create`}
+              className="border border-[#4a7c59] text-[#4a7c59] hover:bg-[#4a7c59] hover:text-white px-4 py-2 rounded-xl text-sm font-medium transition-all"
+            >
+              Create Quiz
+            </a>
             <a
               href={`/jobs/${jobId}/edit`}
               className="bg-[#4a7c59] hover:bg-[#5a9c6e] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#4a7c59]/30"

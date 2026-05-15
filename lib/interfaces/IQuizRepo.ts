@@ -8,5 +8,7 @@ export interface IQuizRepo {
     questions: QuizQuestion[],
   ): Promise<void>;
   findById(quizId: string): Promise<QuizRecord | null>;
+  findAll(): Promise<QuizRecord[]>;
+  findByJobId(jobId:string) : Promise<QuizRecord[]>;
   saveSelection(quizId: string, selected: QuizQuestion[]): Promise<void>;
 }

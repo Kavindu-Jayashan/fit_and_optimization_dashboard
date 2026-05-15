@@ -10,6 +10,8 @@ export function createQuizService(
     input: GenerateQuizInput,
   ): Promise<{ quizId: string; questions: QuizQuestion[] }> {
     const questions = await generationService.generate(input);
+    console.log("Question length: ", questions.length);
+    console.log("Questions: ", questions, null, 2);
     const quizId = `quiz-${Date.now()}`;
     const topic = input.topic ?? input.jobTitle ?? "General";
     await quizRepo.save(quizId, input.jobId ?? "", topic, questions);
@@ -22,6 +24,14 @@ export function createQuizService(
     return quiz;
   }
 
+  async function getAllQuizzes(): Promise<QuizRecord[]> {
+    return quizRepo.findAll();
+  }
+
+  async function getQuizById(quizId: string): Promise<QuizRecord[]> {
+    return quizRepo.findByJobId(quizId);
+  }
+
   async function saveSelection(
     quizId: string,
     selected: QuizQuestion[],
@@ -32,5 +42,5 @@ export function createQuizService(
     await quizRepo.saveSelection(quizId, selected);
   }
 
-  return { generateQuiz, getQuiz, saveSelection };
+  return { generateQuiz, getQuiz, getAllQuizzes, getQuizById, saveSelection };
 }

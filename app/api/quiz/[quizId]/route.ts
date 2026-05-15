@@ -5,15 +5,16 @@ import { createQuizGenerationService } from "../../../../lib/services/quizGenera
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { quizId: string } },
+  { params }: { params: Promise<{ quizId: string }> },
 ) {
   try {
+    const { quizId } = await params;
     const service = createQuizService(
       createQuizRepo(),
       createQuizGenerationService(),
     );
 
-    const quiz = await service.getQuiz(params.quizId);
+    const quiz = await service.getQuiz(quizId);
     return NextResponse.json({ quiz });
   } catch (err: any) {
     console.error("GET /api/quiz/[quizId] error: ", err);
@@ -26,19 +27,20 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { quizId: string } },
+  { params }: { params: Promise<{ quizId: string }> },
 ) {
   try {
+    const { quizId } = await params;
     const { selected } = await req.json();
     const service = createQuizService(
       createQuizRepo(),
       createQuizGenerationService(),
     );
 
-    await service.saveSelection(params.quizId, selected);
+    await service.saveSelection(quizId, selected);
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error("PUT api/quiz/[quizId] error :", err);
+    console.error("PUT /api/quiz/[quizId] error :", err);
     return NextResponse.json(
       { error: err.message || "Failed to save selection." },
       { status: 500 },

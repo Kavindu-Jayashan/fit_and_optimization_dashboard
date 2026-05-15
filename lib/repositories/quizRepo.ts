@@ -8,6 +8,18 @@ export function createQuizRepo(): IQuizRepo {
     "Quizzes",
   );
 
+  function mapEntityToRecord(entity: any): QuizRecord {
+    return {
+      rowKey: String(entity.rowKey),
+      jobId: String(entity.jobId ?? ""),
+      topic: String(entity.topic ?? ""),
+      allQuestionsJson: String(entity.allQuestionsJson || []),
+      selectedQuestionsJson: String(entity.selectedQuestionsJson || []),
+      questionCount: Number(entity.questionCount ?? 0),
+      createdAt: String(entity.createdAt ?? ""),
+    };
+  }
+
   //   save newly generated questions
   // selectedQuestionsJson starts empty - populated after recruiter selects
   async function save(
@@ -22,7 +34,7 @@ export function createQuizRepo(): IQuizRepo {
       jobId: String(jobId),
       topic: String(topic),
       allQuestionsJson: JSON.stringify(questions),
-      selectedQuestions: "[]",
+      selectedQuestions: JSON.stringify([]),
       questionCount: questions.length,
       createdAt: new Date().toISOString(),
     });
@@ -32,18 +44,33 @@ export function createQuizRepo(): IQuizRepo {
   async function findById(quizId: string): Promise<QuizRecord | null> {
     try {
       const entity = await tableClient.getEntity("quizzes", quizId);
-      return {
-        rowKey: String(entity.rowKey),
-        jobId: String(entity.jobId ?? ""),
-        topic: String(entity.topic ?? ""),
-        allQuestionsJson: String(entity.allQuestionsJson ?? ""),
-        selectedQuestionsJson: String(entity.selectedQuestionsJson ?? ""),
-        questionCount: Number(entity.questionCount ?? 0),
-        createdAt: String(entity.createdAt ?? ""),
-      };
+      return mapEntityToRecord(entity);
     } catch {
       return null;
     }
+  }
+
+  // return all the quizzes for a listing page
+  // sorted by time created newest to the oldest
+  async function findAll(): Promise<QuizRecord[]> {
+    const quizzes: QuizRecord[] = [];
+    const entities = tableClient.listEntities({
+      queryOptions: { filter: "PartitionKey eq 'quizzes'" },
+    });
+    for await (const entity of entities) {
+      quizzes.push(mapEntityToRecord(entity));
+    }
+
+    return quizzes.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  }
+
+  // return all the quizzes associated with a specific job id
+  async function findByJobId(jobId: string): Promise<QuizRecord[]> {
+    const all = await findAll();
+    return all.filter((quiz) => quiz.jobId === jobId);
   }
 
   //   save the recruiters selection to Azure
@@ -59,5 +86,5 @@ export function createQuizRepo(): IQuizRepo {
     });
   }
 
-  return { save, findById, saveSelection };
+  return { save, findById, findAll, findByJobId, saveSelection };
 }

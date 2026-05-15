@@ -2,9 +2,11 @@
 
 import {
   BriefcaseIcon,
+  ClipboardListIcon,
   DoorClosedLockedIcon,
   FileTextIcon,
   LayoutDashboardIcon,
+  LucideBookText,
   Settings2Icon,
   SparklesIcon,
 } from "lucide-react";
@@ -37,6 +39,16 @@ const data = {
       url: "/jobs/new",
       icon: SparklesIcon,
     },
+    {
+      title: "Generate Custom Quiz",
+      url: "/jobs/[jobId]/quiz/create",
+      icon: LucideBookText
+    },
+    {
+      title: "Quiz Library",
+      url: "/quizzes",
+      icon: ClipboardListIcon
+    }
   ],
   navSecondary: [
     {
