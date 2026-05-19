@@ -6,6 +6,8 @@ import { SidebarInset, SidebarProvider } from "../../../components/ui/sidebar";
 import { AppSidebar } from "../../../components/app-sidebar";
 import { SiteHeader } from "../../../components/site-header";
 import { ATSKeywords, JobRecord } from "../../../lib/types/job";
+import { QuizPreviewDialog } from "../../../components/quiz-preview-dialog";
+import { QuizQuestion, QuizRecord } from "../../../lib/types/quiz";
 
 export default function JobDetailsPage() {
   const { jobId } = useParams();
@@ -14,6 +16,14 @@ export default function JobDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+
+  const [dialogQuiz, setDialogQuiz] = useState<{
+    quizId: string;
+    topic: string;
+    questions: QuizQuestion[];
+  } | null>(null);
+
+  const [quizzesLoading, setQuizzesLoading] = useState(false);
 
   useEffect(() => {
     async function fetchJob() {
@@ -37,6 +47,39 @@ export default function JobDetailsPage() {
     }
     fetchJob();
   }, [jobId]);
+
+  async function handleViewQuiz() {
+    setQuizzesLoading(true);
+    try {
+      const res = await fetch(`/api/quizzes`);
+      const data = await res.json();
+      if (!res.ok) throw new Error();
+
+      const allQuizzes: QuizRecord[] = Object.values(data.grouped)
+        .flatMap((groups: any) => groups.flatMap((g: any) => g.quizzes))
+        .filter((q: QuizRecord) => q.jobId === jobId);
+
+      if (allQuizzes.length === 0) {
+        alert("No quizzes found for this Job.");
+        return;
+      }
+
+      const latest = allQuizzes.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )[0];
+
+      setDialogQuiz({
+        quizId: latest.rowKey,
+        topic: latest.topic,
+        questions: JSON.parse(latest.allQuestionsJson || "[]"),
+      });
+    } catch (err: any) {
+      setError(err.message || "Failed to load Quiz");
+    } finally {
+      setQuizzesLoading(false);
+    }
+  }
 
   async function copyToClipboard(text: string, key: string) {
     await navigator.clipboard.writeText(text);
@@ -155,12 +198,21 @@ export default function JobDetailsPage() {
                 {job?.title}
               </h1>
             </div>
-            <a
-              href={`/jobs/${jobId}/quiz/create`}
-              className="border border-[#4a7c59] text-[#4a7c59] hover:bg-[#4a7c59] hover:text-white px-4 py-2 rounded-xl text-sm font-medium transition-all"
-            >
-              Create Quiz
-            </a>
+            <div className="flex gap-2">
+              <a
+                href={`/jobs/${jobId}/quiz/create`}
+                className="border border-[#4a7c59] text-[#4a7c59] hover:bg-[#4a7c59] hover:text-white px-4 py-2 rounded-xl text-sm font-medium transition-all"
+              >
+                Create Quiz
+              </a>
+              <button
+                onClick={handleViewQuiz}
+                disabled={quizzesLoading}
+                className="border border-[#4a7c59] text-[#4a7c59] hover:bg-[#4a7c59] hover:text-white px-4 py-2 rounded-xl text-sm font-medium transition-all"
+              >
+                {quizzesLoading ? "Loading..." : "View Quiz"}
+              </button>
+            </div>
             <a
               href={`/jobs/${jobId}/edit`}
               className="bg-[#4a7c59] hover:bg-[#5a9c6e] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#4a7c59]/30"
@@ -262,6 +314,20 @@ export default function JobDetailsPage() {
             </div>
           </div>
         </div>
+        {dialogQuiz && (
+          <QuizPreviewDialog
+            open={!!dialogQuiz}
+            onClose={() => setDialogQuiz(null)}
+            quizId={dialogQuiz.quizId}
+            topic={dialogQuiz.topic}
+            questions={dialogQuiz.questions}
+            onSave={(updated) => {
+              setDialogQuiz((prev) =>
+                prev ? { ...prev, questions: updated } : null,
+              );
+            }}
+          />
+        )}
       </SidebarInset>
     </SidebarProvider>
   );

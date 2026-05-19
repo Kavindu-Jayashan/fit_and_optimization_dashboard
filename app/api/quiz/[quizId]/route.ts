@@ -31,13 +31,19 @@ export async function PUT(
 ) {
   try {
     const { quizId } = await params;
-    const { selected } = await req.json();
+    const { selected , all } = await req.json();
     const service = createQuizService(
       createQuizRepo(),
       createQuizGenerationService(),
     );
 
-    await service.saveSelection(quizId, selected);
+    if(all) {
+      await service.updateAllQuestions(quizId, all , selected ?? all)
+    }else{
+      await service.saveSelection(quizId,selected)
+    }
+
+    
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error("PUT /api/quiz/[quizId] error :", err);

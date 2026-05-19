@@ -10,11 +10,16 @@ export function createQuizService(
     input: GenerateQuizInput,
   ): Promise<{ quizId: string; questions: QuizQuestion[] }> {
     const questions = await generationService.generate(input);
-    console.log("Question length: ", questions.length);
-    console.log("Questions: ", questions, null, 2);
+
     const quizId = `quiz-${Date.now()}`;
     const topic = input.topic ?? input.jobTitle ?? "General";
-    await quizRepo.save(quizId, input.jobId ?? "", topic, questions);
+    await quizRepo.save(
+      quizId,
+      input.jobId ?? "",
+      topic,
+      questions,
+      input.groupLabel ?? "",
+    );
     return { quizId, questions };
   }
 
@@ -42,5 +47,33 @@ export function createQuizService(
     await quizRepo.saveSelection(quizId, selected);
   }
 
-  return { generateQuiz, getQuiz, getAllQuizzes, getQuizById, saveSelection };
+  async function createFromPool(
+    jobId: string,
+    topic: string,
+    groupLabel: string,
+    questions: QuizQuestion[],
+  ): Promise<string> {
+    const quizId = `quiz-${Date.now()}`;
+    await quizRepo.save(quizId, jobId, topic, questions, groupLabel);
+    await quizRepo.saveSelection(quizId, questions);
+    return quizId;
+  }
+
+  async function updateAllQuestions(
+    quizId: string,
+    all: QuizQuestion[],
+    selected: QuizQuestion[],
+  ): Promise<void> {
+    await quizRepo.updateAllQuestions(quizId, all, selected);
+  }
+
+  return {
+    generateQuiz,
+    getQuiz,
+    getAllQuizzes,
+    createFromPool,
+    getQuizById,
+    updateAllQuestions,
+    saveSelection,
+  };
 }

@@ -30,25 +30,26 @@ const data = {
   },
   navMain: [
     {
-      title: "Job Listings",
-      url: "/jobs",
-      icon: BriefcaseIcon,
-    },
-    {
       title: "Generate Job Description",
       url: "/jobs/new",
       icon: SparklesIcon,
     },
     {
+      title: "Job Listings",
+      url: "/jobs",
+      icon: BriefcaseIcon,
+    },
+
+    {
       title: "Generate Custom Quiz",
       url: "/jobs/[jobId]/quiz/create",
-      icon: LucideBookText
+      icon: LucideBookText,
     },
     {
       title: "Quiz Library",
       url: "/quizzes",
-      icon: ClipboardListIcon
-    }
+      icon: ClipboardListIcon,
+    },
   ],
   navSecondary: [
     {
@@ -56,7 +57,6 @@ const data = {
       url: "#",
       icon: <Settings2Icon />,
     },
-    
   ],
 };
 
@@ -72,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="/jobs">
                 <FileTextIcon className="size-5 text-[#4a7c59]" />
-                <span className="text-base font-semibold">Dashboard</span>
+                <span className="text-base font-semibold">CV Collector</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

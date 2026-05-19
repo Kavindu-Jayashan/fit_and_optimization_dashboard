@@ -13,6 +13,7 @@ export function createQuizRepo(): IQuizRepo {
       rowKey: String(entity.rowKey),
       jobId: String(entity.jobId ?? ""),
       topic: String(entity.topic ?? ""),
+      groupLabel: String(entity.groupLabel ?? ""),
       allQuestionsJson: String(entity.allQuestionsJson || []),
       selectedQuestionsJson: String(entity.selectedQuestionsJson || []),
       questionCount: Number(entity.questionCount ?? 0),
@@ -27,11 +28,13 @@ export function createQuizRepo(): IQuizRepo {
     jobId: string,
     topic: string,
     questions: QuizQuestion[],
+    groupLabel: string = "",
   ): Promise<void> {
     await tableClient.upsertEntity({
       partitionKey: "quizzes",
       rowKey: quizId,
       jobId: String(jobId),
+      groupLabel: String(groupLabel),
       topic: String(topic),
       allQuestionsJson: JSON.stringify(questions),
       selectedQuestions: JSON.stringify([]),
@@ -73,6 +76,19 @@ export function createQuizRepo(): IQuizRepo {
     return all.filter((quiz) => quiz.jobId === jobId);
   }
 
+  async function updateAllQuestions(
+    quizId: string,
+    all: QuizQuestion[],
+    selected: QuizQuestion[],
+  ): Promise<void> {
+    await tableClient.upsertEntity({
+      partitionKey: "quizzes",
+      rowKey: quizId,
+      allQuestionsJson: JSON.stringify(all),
+      selectedQuestionsJson: JSON.stringify(selected),
+    });
+  }
+
   //   save the recruiters selection to Azure
   // used when recruiter finalize their selection
   async function saveSelection(
@@ -86,5 +102,5 @@ export function createQuizRepo(): IQuizRepo {
     });
   }
 
-  return { save, findById, findAll, findByJobId, saveSelection };
+  return { save, findById, findAll, findByJobId, updateAllQuestions, saveSelection };
 }

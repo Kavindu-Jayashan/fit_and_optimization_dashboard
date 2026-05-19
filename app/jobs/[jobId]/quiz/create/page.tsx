@@ -19,9 +19,14 @@ export default function CreateQuizPage() {
   const params = useParams();
   const jobId = params.jobId;
   const router = useRouter();
+  const [selectedJob, setSelectedJob] = useState("");
   const [job, setJob] = useState<Job | null>(null);
   const [mode, setMode] = useState<"job" | "topic">("job");
   const [topic, setTopic] = useState("");
+  const [jobs, setJobs] = useState<
+    { rowKey: string; title: string; seniority: string }[]
+  >([]);
+
   const [questionCount, setQuestionCount] = useState(10);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -43,6 +48,16 @@ export default function CreateQuizPage() {
     if (jobId) fetchJob();
   }, [jobId]);
 
+  useEffect(() => {
+    async function fetchJobs() {
+      const res = await fetch(`/api/jobs`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setJobs(data.jobs);
+    }
+    fetchJobs();
+  }, []);
+
   async function handleGenerate() {
     setErr("");
 
@@ -63,14 +78,16 @@ export default function CreateQuizPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          jobId: mode === "job" ? jobId : undefined,
+          jobId: mode === "job" ? jobId : selectedJob || undefined,
           topic: mode === "topic" ? topic : undefined,
+
           questionCount,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      router.push(`/jobs/${jobId}/quiz?quizId=${data.quizId}`);
+      const redirectJobId = mode === "job" ? jobId : selectedJob;
+      router.push(`/jobs/${redirectJobId}/quiz?quizId=${data.quizId}`);
     } catch (err: any) {
       setErr(err.message || "failed to generate quiz");
     } finally {
@@ -154,6 +171,30 @@ export default function CreateQuizPage() {
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                 />
+                <div>
+                  <label className="text-xs font-medium text-gray-400 uppercase tracking-widest">
+                    Related Job
+                  </label>
+                  <select
+                    name="selectedJob"
+                    value={selectedJob}
+                    onChange={(e) => setSelectedJob(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 outline-none focus:border-[#4a7c59] focus:ring-2 focus:ring-[#4a7c59]/20 transition-all bg-white"
+                  >
+                    <option value="">Select Job</option>
+                    {jobs
+                      .sort((a, b) => a.title.localeCompare(b.title))
+                      .map((job) => (
+                        <option key={job.rowKey} value={job.rowKey}>
+                          {job.title} - {job.seniority}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <p className="text-xs text-gray-300">
+                  This is the group this quiz will appear under in the quiz
+                  library.
+                </p>
               </div>
             )}
             {/* using job to generate quiz */}
