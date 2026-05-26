@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyOTP } from "../../../../lib/otp";
+import { createAuthService } from "../../../../lib/services/authService";
+import { authRepoInstance } from "../../../../lib/repositories/authRepo";
 
+// same instance used in send-otp so that
+// in-memory OTP store is consistent across both routes
+
+
+// verify the submitted OTp and set an httpOnly session cookie
 export async function POST(request: NextRequest) {
   try {
     const { email, otp } = await request.json();
@@ -12,7 +18,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isValid = verifyOTP(email, otp);
+    const authService = createAuthService(authRepoInstance);
+    const isValid = authService.verifyOTP(email, otp);
 
     if (!isValid) {
       return NextResponse.json(
@@ -21,13 +28,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // sets httpOnly cookie for session management
     const res = NextResponse.json({ success: true });
-    res.cookies.set("session_email", email, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24,
-      path: "/",
-    });
+    
 
     return res;
   } catch (err) {

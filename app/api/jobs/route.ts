@@ -1,35 +1,21 @@
-import { NextResponse } from 'next/server';
-import { TableClient } from '@azure/data-tables';
-
-const tableClient =  TableClient.fromConnectionString(
-    process.env.AZURE_STORAGE_CONNECTION_STRING!,
-    process.env.AZURE_TABLE_NAME!,
-)
+import { NextResponse } from "next/server";
+import { createJobService } from "../../../lib/services/jobService";
+import { createJobRepo } from "../../../lib/repositories/jobRepository";
+import { createOpenAIGenerationService } from "../../../lib/services/openAIGenerationService";
 
 export async function GET() {
-    try{
-        const jobs = [];
-        const entities = await tableClient.listEntities({
-            queryOptions:{filter: "PartitionKey eq 'jobs'"}
-        })
-
-        for await (const entity of entities){
-            jobs.push({
-                rowKey:entity.rowKey,
-                title:entity.title ?? "",
-                description:entity.description ?? "",
-                requirements:entity.requirements ?? ""
-            })
-        }
-
-        return NextResponse.json(jobs);
-    }
-    catch(err){
-        console.error("error in fetching jobs: " , err)
-        return NextResponse.json(
-            {error:"failed to fetch jobs"},
-            {status:500},
-        )
-    }
+  try {
+    const service = createJobService(
+      createJobRepo(),
+      createOpenAIGenerationService(),
+    );
+    const jobs = await service.getAllJobs();
+    return NextResponse.json({ jobs });
+  } catch (err: any) {
+    console.error("GET /api/jobs error: ", err);
+    return NextResponse.json(
+      { error: "Failed to fetch jobs" },
+      { status: 500 },
+    );
+  }
 }
-

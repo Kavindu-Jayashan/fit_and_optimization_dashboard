@@ -2,10 +2,13 @@
 
 import {
   BriefcaseIcon,
+  ClipboardListIcon,
   DoorClosedLockedIcon,
   FileTextIcon,
   LayoutDashboardIcon,
+  LucideBookText,
   Settings2Icon,
+  SparklesIcon,
 } from "lucide-react";
 import {
   Sidebar,
@@ -27,19 +30,25 @@ const data = {
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboardIcon,
+      title: "Generate Job Description",
+      url: "/jobs/new",
+      icon: SparklesIcon,
     },
     {
       title: "Job Listings",
       url: "/jobs",
       icon: BriefcaseIcon,
     },
+
     {
-      title: "My CVs",
-      url: "#",
-      icon: FileTextIcon,
+      title: "Generate Custom Quiz",
+      url: "/jobs/[jobId]/quiz/create",
+      icon: LucideBookText,
+    },
+    {
+      title: "Quiz Library",
+      url: "/quizzes",
+      icon: ClipboardListIcon,
     },
   ],
   navSecondary: [
@@ -47,11 +56,6 @@ const data = {
       title: "settings",
       url: "#",
       icon: <Settings2Icon />,
-    },
-    {
-      title: "logout",
-      url: "#",
-      icon: <DoorClosedLockedIcon />,
     },
   ],
 };
@@ -68,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="/jobs">
                 <FileTextIcon className="size-5 text-[#4a7c59]" />
-                <span className="text-base font-semibold">Dashboard</span>
+                <span className="text-base font-semibold">CV Collector</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

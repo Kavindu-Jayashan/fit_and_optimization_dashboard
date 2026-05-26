@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Instrument_Serif, DM_Sans } from "next/font/google";
 import { TooltipProvider } from "../components/ui/tooltip";
+import { SessionProvider } from "next-auth/react";
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -30,7 +31,9 @@ export default function RootLayout({
       className={`${instrumentSerif.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <TooltipProvider> {children}</TooltipProvider>
+        <SessionProvider>
+          <TooltipProvider> {children}</TooltipProvider>
+        </SessionProvider>
       </body>
     </html>
   );
